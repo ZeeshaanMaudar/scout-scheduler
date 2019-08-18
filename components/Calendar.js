@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import {
   Text,
   View,
-  Button,
-  Picker,
   StyleSheet
 } from 'react-native';
 import {Agenda} from 'react-native-calendars';
@@ -71,7 +69,6 @@ class AgendaScreen extends Component {
         let filteredClients = stateClients.filter(client => {
           return value !== client.value
         });
-        console.log(555, filteredClients)
         this.setState({ clients: filteredClients })
       }
   }
