@@ -8,12 +8,13 @@ import {
 } from 'react-native';
 import {Agenda} from 'react-native-calendars';
 
+import { Dropdown } from 'react-native-material-dropdown';
+
 class AgendaScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: {},
-      farmer: '',
+      items: {}
     };
   }
 
@@ -48,39 +49,42 @@ class AgendaScreen extends Component {
     });
   }
 
-  callPickerItem() {
+  callDropDownItems() {
+    let newArray = [];
     const token = '1536660107LWZ2JGK17J72HR4O5NU53FBBSLSMRB';
-      fetch('https://sherlock.aerobotics.io/developers/clients/', {
+    fetch('https://sherlock.aerobotics.io/developers/clients/', {
       headers: {
         Authorization: `${token}`
       }
     })
     .then(res => res.json())
     .then(json => {
-      json.results.map(farmer => (
-        <Picker.Item label={farmer.name} value={farmer.name} />
-      ))
+      json.results.map(farmer => {
+        newArray.push({value: farmer.name})
+      });
     })
+    return newArray;
   }
 
-  updateFarmer = farmer => {
-    this.setState({ farmer });
+  onChangeTextPress(value, date, stateItems, stateClients){
+      if(stateItems[date].length > 1){
+        let filteredClients = stateClients.filter(client => {
+          return value !== client.value
+        });
+        console.log(555, filteredClients)
+        this.setState({ clients: filteredClients })
+      }
   }
 
   renderItem(item) {
     return (
       <View style={styles.item}>
         <Text>{item.title} to be assigned on {item.date}</Text>
-        <Button title="Assign Work" onPress={() => console.log('it worked each time')}/>
-        <Picker
-          selectedValue={this.state.farmer}
-          onValueChange={this.updateFarmer}
-        >
-          {/* {this.callPickerItem()} */}
-          <Picker.Item label = "Steve" value = "steve" />
-               <Picker.Item label = "Ellen" value = "ellen" />
-               <Picker.Item label = "Maria" value = "maria" />
-        </Picker>
+        <Dropdown
+          label='Assign Someone'
+          data={this.callDropDownItems()}
+          onChangeText={(value)=>{this.onChangeTextPress(value, item.date, this.state.items, this.callDropDownItems())}}
+         />
       </View>
     );
   }
@@ -109,19 +113,6 @@ class AgendaScreen extends Component {
         renderItem={this.renderItem.bind(this)}
         renderEmptyDate={this.renderEmptyDate.bind(this)}
         rowHasChanged={this.rowHasChanged.bind(this)}
-        // markingType={'period'}
-        // markedDates={{
-        //    '2017-05-08': {textColor: '#666'},
-        //    '2017-05-09': {textColor: '#666'},
-        //    '2017-05-14': {startingDay: true, endingDay: true, color: 'blue'},
-        //    '2017-05-21': {startingDay: true, color: 'blue'},
-        //    '2017-05-22': {endingDay: true, color: 'gray'},
-        //    '2017-05-24': {startingDay: true, color: 'gray'},
-        //    '2017-05-25': {color: 'gray'},
-        //    '2017-05-26': {endingDay: true, color: 'gray'}}}
-        // monthFormat={'yyyy'}
-        // theme={{calendarBackground: 'red', agendaKnobColor: 'green'}}
-        //renderDay={(day, item) => (<Text>{day ? day.day: 'item'}</Text>)}
       />
     );
   }
